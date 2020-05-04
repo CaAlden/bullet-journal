@@ -48,7 +48,10 @@ export class DB implements IDbInteractor {
   };
 
   public removeItem = (id: Id): IO<void> => {
-    return () => this.storage.removeItem(id);
+    return () => {
+      console.log(`removing ${id}`);
+      this.storage.removeItem(id);
+    }
   };
 }
 
@@ -76,14 +79,18 @@ export class DBObserver implements IDbInteractor {
 
     // Returns an unsubscribe function.
     return () => {
-      pipe(
-        this.subscriptions.get(id),
-        fromNullable,
-        fold(
-          () => {},
-          (a) => {
-            a.filter(test => test !== callback);
-          }
+      console.log('called!');
+      this.subscriptions.set(
+        id,
+        pipe(
+          this.subscriptions.get(id),
+          fromNullable,
+          fold(
+            () => [],
+            (a) => {
+              return a.filter(test => test !== callback);
+            }
+          ),
         ),
       );
     };

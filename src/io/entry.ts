@@ -1,4 +1,6 @@
 import * as iots from 'io-ts';
+import { DateCodec } from './date';
+import { JSONCodec } from './json';
 
 export enum EntryTypes {
   Task = 'task',
@@ -33,20 +35,6 @@ const EntryStateCodec = iots.keyof({
   [EntryStates.Pushed]: null,
 });
 
-const DateCodec = iots.string.pipe(new iots.Type<Date, string, string>(
-  'DateCodec',
-  (x: unknown): x is Date => x instanceof Date,
-  (v, c) => {
-    const attempt = Date.parse(v);
-    if (Number.isNaN(attempt)) {
-      return iots.failure(v, c);
-    } else {
-      return iots.success(new Date(attempt));
-    }
-  },
-  (d) => d.toISOString(),
-));
-
 interface IEntry {
   id: string;
   type: EntryTypes;
@@ -55,15 +43,6 @@ interface IEntry {
   date: Date;
   state: EntryStates;
 }
-
-export const JSONCodec = new iots.Type<object, string, string>(
-  'JSONCodec',
-  (x): x is object => x !== null && typeof x === 'object',
-  (v, c) => {
-    return iots.success(JSON.parse(v));
-  },
-  (c) => JSON.stringify(c),
-);
 
 export const EntryCodec: iots.Type<IEntry, string, string> = JSONCodec.pipe(iots.interface({
   id: iots.string,
