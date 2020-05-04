@@ -1,5 +1,6 @@
 import React from 'react';
 import { useStyles } from '../useStyles';
+import { useColors } from '../../Colors';
 
 interface IProps {
   value: boolean;
@@ -10,11 +11,12 @@ const Priority: React.FC<IProps> = ({
   value,
   setValue,
 }) => {
+  const colors = useColors();
   const classes = useStyles({
     container:{
       padding: '0 5px',
       opacity: value ? 1 : 0.2,
-      color: '#404040',
+      color: colors.black,
       textDecoration: 'none',
       cursor: 'pointer',
       fontSize: '3rem',
@@ -26,7 +28,7 @@ const Priority: React.FC<IProps> = ({
       display: 'flex',
     },
     asterisk: {
-      marginTop: '20px',
+      height: '47px',
     },
   });
   return (
