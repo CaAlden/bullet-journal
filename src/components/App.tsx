@@ -14,6 +14,8 @@ import { IPage, PageCodec } from '../io/page';
 import Page from './Page';
 import NewPageInput from './NewPageInput';
 import { useColors } from '../Colors';
+import { useLastVisited } from '../session';
+import { identity } from 'fp-ts/lib/function';
 
 export const REGISTRY_KEY = '__type_registry';
 export const RegistryCodec = JSONCodec.pipe(t.interface({
@@ -173,19 +175,46 @@ export default function App() {
       (registry) => registry.types[PageCodec.name],
     ),
   );
-  const [selected, setSelected] = useState<null | Id>(!pages || pages.length === 0 ? null : pages[0]);
+
+  const { lastVisited, setLastVisited } = useLastVisited();
+  const initial = !pages || pages.length === 0 ? null :
+    fold<string, string>(
+      (): string => {
+        const first = pages[0];
+        setLastVisited(first)();
+        return first;
+      },
+      identity,
+    )(lastVisited);
+
+  const [selected, setSelected] = useState<null | Id>(initial);
   return (
     <div className={appStyles.page}>
       <div className={appStyles.side}>
         {!pages ? null :
           <ul className={appStyles.list}>{pages.map((id) => (
             <li className={appStyles.listElm} key={id}>
-              <PageLink onClick={() => setSelected(id)} selected={selected === id} id={id} />
+              <PageLink
+                onClick={() => {
+                  setSelected(id);
+                  setLastVisited(id)();
+                }}
+                selected={selected === id}
+                id={id}
+              />
               <button
                 onClick={() => {
                   removePage(id)();
                   if (selected === id) {
                     setSelected(null);
+                    pipe(
+                      lastVisited,
+                      fold(() => {}, (last) => {
+                        if (last === id) {
+                          setLastVisited(null)();
+                        }
+                      }),
+                    );
                   }
                 }}
               >X</button>
