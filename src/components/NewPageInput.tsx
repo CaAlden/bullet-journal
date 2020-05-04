@@ -19,12 +19,14 @@ const getDefaults = (): IPage => ({
 const NewPageInput: React.FC<IProps> = ({ onNew }) => {
   const [name, setName] = useState('');
   const onSubmit = () => {
-    onNew({
-      ...getDefaults(),
-      name,
-    })();
+    if (name !== '') {
+      onNew({
+        ...getDefaults(),
+        name,
+      })();
 
-    setName('');
+      setName('');
+    }
   };
 
   const classes = useStyles({
@@ -43,7 +45,7 @@ const NewPageInput: React.FC<IProps> = ({ onNew }) => {
   return (
     <div className={classes.container}>
       <input className={classes.input} value={name} onChange={e => setName(e.target.value)} placeholder="Input new page name"/>
-      <button onClick={onSubmit}>+</button>
+      <button disabled={name === ''} onClick={onSubmit}>+</button>
     </div>
   );
 };
