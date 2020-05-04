@@ -6,7 +6,7 @@ import Description from './Description';
 import StateSelector from './StateSelector';
 import { useStyle, useStyles } from '../useStyles';
 import { Id, useStorage, DBObserver } from '../../io/db';
-import { useTrackedValue } from '../../io/useTrackedValue';
+import { useTrackedValue, useExistentTrackedValue } from '../../io/useTrackedValue';
 import { pipe } from 'fp-ts/lib/pipeable';
 import { fold, Option } from 'fp-ts/lib/Option';
 
@@ -145,40 +145,32 @@ const getAndDo = <T, R>(oT: Option<T>, f: (t: T) => R): R => {
   );
 };
 
-const makeFieldSetter = <K extends keyof EntryType>(db: DBObserver, field: K, entry: Option<EntryType>) => {
+const makeFieldSetter = <K extends keyof EntryType>(db: DBObserver, field: K, entry: EntryType) => {
   return (val: EntryType[K]) => {
-    getAndDo(entry, (e) => {
-      const newE = {
-        ...e,
-        [field]: val,
-      }
-      db.serialize(newE, EntryCodec)();
-    });
-  }
+    const newE = {
+      ...entry,
+      [field]: val,
+    }
+    db.serialize(newE, EntryCodec)();
+  };
 };
 
 export const EditEntry: React.FC<{ id: Id, remove: () => void; }> = ({
   id,
   remove,
 }) => {
-  const entry = useTrackedValue({ id, type: EntryCodec });
+  const entry = useExistentTrackedValue({ id, type: EntryCodec });
   const storage = useStorage();
-  return pipe(
-    entry,
-    fold(
-      () => null,
-      (e) => (
-        <Entry
-          {...e}
-          setType={makeFieldSetter(storage, 'type', entry)}
-          setState={makeFieldSetter(storage, 'state', entry)}
-          setDesc={makeFieldSetter(storage, 'description', entry)}
-          setPriority={makeFieldSetter(storage, 'priority', entry)}
-          setDate={makeFieldSetter(storage, 'date', entry)}
-          onEnter={focus}
-          remove={<button onClick={remove}>Delete</button>}
-        />
-      ),
-    )
+  return (
+    <Entry
+      {...entry}
+      setType={makeFieldSetter(storage, 'type', entry)}
+      setState={makeFieldSetter(storage, 'state', entry)}
+      setDesc={makeFieldSetter(storage, 'description', entry)}
+      setPriority={makeFieldSetter(storage, 'priority', entry)}
+      setDate={makeFieldSetter(storage, 'date', entry)}
+      onEnter={focus}
+      remove={<button onClick={remove}>Delete</button>}
+    />
   );
 };
