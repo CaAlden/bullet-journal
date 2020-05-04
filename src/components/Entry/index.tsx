@@ -169,7 +169,7 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; }> = ({
       setDesc={makeFieldSetter(storage, 'description', entry)}
       setPriority={makeFieldSetter(storage, 'priority', entry)}
       setDate={makeFieldSetter(storage, 'date', entry)}
-      onEnter={focus}
+      onEnter={() => {}}
       remove={<button onClick={remove}>Delete</button>}
     />
   );
