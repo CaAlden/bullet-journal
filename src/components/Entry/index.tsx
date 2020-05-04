@@ -53,21 +53,17 @@ const Entry: React.FC<IConnected> = ({
 }) => {
   const classes = useStyles({
     container: {
-      display: 'grid',
-      gridTemplateColumns: '20px 20px 1fr 150px 75px',
-      gridTemplateRows: '30px',
+      display: 'flex',
       alignItems: 'center',
       fontSize: '1.5em',
       opacity: state === EntryStates.ToDo ? 1 : 0.6,
       fontWeight: priority ? 700 : 'normal',
-      gap: '20px',
+      height: '50px',
       padding: '5px',
-      ':hover': {
-        background: "#e2e2e2",
-      },
     },
     date: {
       fontSize: '0.75em',
+      padding: '0 10px',
     }
   });
   const dateValue = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`

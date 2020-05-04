@@ -12,6 +12,7 @@ const Priority: React.FC<IProps> = ({
 }) => {
   const classes = useStyles({
     container:{
+      padding: '0 5px',
       opacity: value ? 1 : 0.2,
       color: '#404040',
       textDecoration: 'none',

@@ -22,7 +22,7 @@ const Description: React.FC<IProps> = ({
     textDecoration: crossed ? 'line-through' : 'none',
     background: 'inherit',
     flexGrow: 1,
-    padding: '0 0.5em',
+    margin: '0 5px',
     outline: 'none',
     font: 'inherit',
   });
