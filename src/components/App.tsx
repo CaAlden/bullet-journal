@@ -133,6 +133,7 @@ export default function App() {
   const colors = useColors();
   const appStyles = useStyles({
     page: {
+      flexGrow: 1,
       color: colors.black,
       background: colors.white,
       padding: '1em',
@@ -140,7 +141,6 @@ export default function App() {
       gridTemplateColumns: '200px 1fr',
       gridAutoColumns: '1fr',
       gap: '20px',
-      height: '100%',
     },
     side: {
       padding: '5px',
