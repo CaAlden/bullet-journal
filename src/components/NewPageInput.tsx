@@ -35,7 +35,8 @@ const NewPageInput: React.FC<IProps> = ({ onNew }) => {
     input: {
       outline: 'none',
       border: 'none',
-      font: 'inherit'
+      font: 'inherit',
+      background: 'inherit',
     },
   });
 

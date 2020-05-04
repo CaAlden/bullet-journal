@@ -13,6 +13,7 @@ import { useStyle, useStyles } from './useStyles';
 import { IPage, PageCodec } from '../io/page';
 import Page from './Page';
 import NewPageInput from './NewPageInput';
+import { useColors } from '../Colors';
 
 export const REGISTRY_KEY = '__type_registry';
 export const RegistryCodec = JSONCodec.pipe(t.interface({
@@ -111,12 +112,14 @@ const PageLink: React.FC<{
   onClick,
 }) => {
   const page = useExistentTrackedValue({ id, type: PageCodec });
+  const colors = useColors();
   const className = useStyle({
-    color: 'blue',
+    color: selected ? colors.orange : colors.blue,
     cursor: 'pointer',
     fontWeight: selected ? 'bold' : 'normal',
     fontFamily: 'Permanent Marker',
     ':hover': {
+      color: colors.orange,
       textDecoration: 'underline',
     },
   });
@@ -127,8 +130,11 @@ const PageLink: React.FC<{
 
 export default function App() {
   const { registry, addPage, removePage } = useRegistry();
+  const colors = useColors();
   const appStyles = useStyles({
     page: {
+      color: colors.black,
+      background: colors.white,
       padding: '1em',
       display: 'grid',
       gridTemplateColumns: '200px 1fr',
@@ -140,7 +146,7 @@ export default function App() {
       padding: '5px',
       display: 'flex',
       flexDirection: 'column',
-      borderRight: '1px solid #888',
+      borderRight: `1px solid ${colors.black}`,
     },
     main: {
       flexGrow: 1,
