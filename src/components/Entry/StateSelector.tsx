@@ -56,9 +56,9 @@ const useHovered = (): [boolean, (node: null | HTMLElement) => void] => {
 const getSymbol = (s: EntryStates, t: EntryTypes) => {
   if (s === EntryStates.ToDo) {
     switch (t) {
-      case EntryTypes.Task: return 'O';
+      case EntryTypes.Task: return '●';
       case EntryTypes.Note: return '—';
-      case EntryTypes.Event: return 'Δ';
+      case EntryTypes.Event: return '▲';
     }
   } else {
     switch (s) {
