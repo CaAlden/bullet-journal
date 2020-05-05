@@ -180,7 +180,14 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: bo
   const quickButtons = (
     <div className={classes.quickButtons}>
       {entry.state !== EntryStates.Completed &&
-        <Button hoverColor={colors.white} hoverBackground={colors.green} onClick={() => setState(EntryStates.Completed)}>✓</Button>
+        <Button
+          hoverColor={colors.white}
+          hoverBackground={colors.green}
+          onClick={() => setState(EntryStates.Completed)}
+          style={{
+            fontSize: '0.8em',
+          }}
+        >✓</Button>
       }
       <Button hoverColor={colors.white} hoverBackground={colors.orange} onClick={remove}>X</Button>
     </div>
