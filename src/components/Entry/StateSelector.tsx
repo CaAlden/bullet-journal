@@ -107,7 +107,6 @@ const StateSelector: React.FC<IProps> = ({
             onClick={() => isType(op) ? setType(op) : setState(op)}
             style={{
               font: 'inherit',
-              opacity: isSelected ? 1 : 0.7,
               cursor: isSelected ? 'no-drop' : 'pointer',
               background: isSelected && hovered ? colors.orange : undefined,
               color: !hovered && isSelected && op === EntryTypes.Note ? colors.darkgreen : undefined,
