@@ -3,6 +3,7 @@ import { EntryStates, EntryTypes } from '../../io/entry';
 import { useStyle, useStyles } from '../useStyles';
 import { useHovered } from '../../utils';
 import { useColors } from '../../Colors';
+import { Button } from '../Button';
 
 interface IProps {
   state: EntryStates;
@@ -11,9 +12,9 @@ interface IProps {
   setType: (type: EntryTypes) => void;
 }
 
-const Center: React.FC = ({ children }) => {
+const Center: React.FC<{ offset?: number }> = ({ children, offset = 6 }) => {
   const style = useStyle({
-    paddingBottom: '4px',
+    paddingBottom: `${offset}px`,
     lineHeight: 0,
   });
 
@@ -23,8 +24,8 @@ const Center: React.FC = ({ children }) => {
 };
 
 const Symbols: { [K in EntryTypes | EntryStates]: ReactNode } = {
-  [EntryTypes.Task]: <Center>●</Center>,
-  [EntryTypes.Note]: <Center>—</Center>,
+  [EntryTypes.Task]: <Center offset={4}>●</Center>,
+  [EntryTypes.Note]: <Center offset={4}>—</Center>,
   [EntryTypes.Event]: <Center>▲</Center>,
   [EntryStates.Pushed]: <Center>{'<'}</Center>,
   [EntryStates.Migrated]: <Center>{'>'}</Center>,
@@ -32,15 +33,6 @@ const Symbols: { [K in EntryTypes | EntryStates]: ReactNode } = {
   [EntryStates.Completed]: <Center>x</Center>,
   [EntryStates.ToDo]: <Center>#</Center>,
 };
-
-const ButtonStyles = {
-  outline: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  background: 'inherit',
-  font: 'inherit',
-  margin: '0',
-} as const;
 
 const StateButton: React.FC<{
   state: EntryStates;
@@ -92,21 +84,6 @@ const StateSelector: React.FC<IProps> = ({
         width: `calc(34px * ${states.length + types.length})`,
       },
     },
-    option: {
-      ...ButtonStyles,
-      minHeight: '30px',
-      minWidth: '30px',
-      maxHeight: '30px',
-      maxWidth: '30px',
-      marginRight: '4px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: '100%',
-      ':hover': {
-        background: '#e2e2e2e2'
-      }
-    },
   });
 
   const selected = state === EntryStates.ToDo ? type : state;
@@ -123,19 +100,21 @@ const StateSelector: React.FC<IProps> = ({
       {options.map(op => {
         const isSelected = op === type || op === state;
         return (
-          <button
+          <Button
             key={op}
-            className={styles.option}
+            hoverBackground="#333"
+            hoverColor={colors.white}
             onClick={() => isType(op) ? setType(op) : setState(op)}
             style={{
+              font: 'inherit',
               opacity: isSelected ? 1 : 0.7,
               cursor: isSelected ? 'no-drop' : 'pointer',
               background: isSelected && hovered ? colors.orange : undefined,
-              color: !hovered && isSelected && op === EntryTypes.Note ? colors.darkgreen : 'inherit',
+              color: !hovered && isSelected && op === EntryTypes.Note ? colors.darkgreen : undefined,
             }}
           >
             {Symbols[op]}
-          </button>
+          </Button>
         );
       })}
     </div>

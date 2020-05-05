@@ -11,6 +11,7 @@ import { pipe } from 'fp-ts/lib/pipeable';
 import { fold, Option } from 'fp-ts/lib/Option';
 import { useColors } from '../../Colors';
 import { useHovered } from '../../utils';
+import { Button } from '../Button';
 
 const getNewEntry = (): EntryType => {
   return ({
@@ -157,23 +158,6 @@ const makeFieldSetter = <K extends keyof EntryType>(db: DBObserver, field: K, en
   };
 };
 
-const ButtonBase = {
-  outline: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  background: 'inherit',
-  margin: '0',
-  minHeight: '30px',
-  minWidth: '30px',
-  maxHeight: '30px',
-  maxWidth: '30px',
-  marginRight: '4px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderRadius: '100%',
-} as const;
-
 export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: boolean }> = ({
   id,
   showCompleted,
@@ -182,21 +166,6 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: bo
   const colors = useColors();
   const [hovered, ref] = useHovered();
   const classes = useStyles({
-    remove: {
-      ...ButtonBase,
-      ':hover': {
-        background: colors.orange,
-        color: colors.white,
-      },
-    },
-    complete: {
-      ...ButtonBase,
-      fontSize: '0.8em',
-      ':hover': {
-        background: colors.green,
-        color: colors.white,
-      },
-    },
     quickButtons: {
       width: hovered ? '70px' : '0px',
       overflow: 'hidden',
@@ -211,9 +180,9 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: bo
   const quickButtons = (
     <div className={classes.quickButtons}>
       {entry.state !== EntryStates.Completed &&
-        <button className={classes.complete} onClick={() => setState(EntryStates.Completed)}>✓</button>
+        <Button hoverColor={colors.white} hoverBackground={colors.green} onClick={() => setState(EntryStates.Completed)}>✓</Button>
       }
-      <button className={classes.remove} onClick={remove}>X</button>
+      <Button hoverColor={colors.white} hoverBackground={colors.orange} onClick={remove}>X</Button>
     </div>
   );
 
