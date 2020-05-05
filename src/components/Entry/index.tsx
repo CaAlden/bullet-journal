@@ -58,7 +58,7 @@ const Entry: React.FC<IConnected> = ({
       display: 'flex',
       alignItems: 'center',
       fontSize: '1.5em',
-      opacity: state === EntryStates.ToDo ? 1 : 0.6,
+      background: state === EntryStates.ToDo ? 'inherit' : '#ddd',
       fontWeight: priority ? 700 : 'normal',
       height: '50px',
       padding: '5px',
