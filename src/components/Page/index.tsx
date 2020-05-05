@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { EditEntry, AddEntry } from '../Entry';
 import { useStorage, Id } from '../../io/db';
 import { PageCodec } from '../../io/page';
@@ -51,6 +51,7 @@ const usePage = (id: Id) => {
 const Page: React.FC<{ id: Id }> = ({
   id,
 }) => {
+  const [showCompleted, setShowCompleted] = useState(false);
   const {
     page,
     removeEntry,
@@ -65,23 +66,37 @@ const Page: React.FC<{ id: Id }> = ({
     },
     header: {
       boxSizing: 'border-box',
-      outline: 'none',
-      background: 'inherit',
-      border: 'none',
       borderBottom: '1px solid black',
-      fontSize: '2em',
-      fontFamily: 'Permanent Marker',
       fontWeight: 'bold',
       padding: '0px 0px 15px 0px',
       margin: '0px 0px 15px 0px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    name: {
+      outline: 'none',
+      background: 'inherit',
+      border: 'none',
+      fontSize: '2em',
+      fontFamily: 'Permanent Marker',
+    },
+    label: {
+      padding: '0 5px',
     },
   });
 
   return (
     <div className={classes.main}>
-      <input className={classes.header} value={page.name} onChange={e => setName(e.target.value)}/>
+      <div className={classes.header}>
+        <input className={classes.name} value={page.name} onChange={e => setName(e.target.value)}/>
+        <div>
+          <label className={classes.label}>Show Completed</label>
+          <input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} />
+        </div>
+      </div>
       {page.tasks.map((id) =>
-        <EditEntry id={id} key={id} remove={removeEntry(id)}/>
+        <EditEntry id={id} key={id} remove={removeEntry(id)} showCompleted={showCompleted}/>
       )}
       <AddEntry onNew={e => {
         const addIO = addEntry(e);

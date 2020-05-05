@@ -155,13 +155,14 @@ const makeFieldSetter = <K extends keyof EntryType>(db: DBObserver, field: K, en
   };
 };
 
-export const EditEntry: React.FC<{ id: Id, remove: () => void; }> = ({
+export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: boolean }> = ({
   id,
+  showCompleted,
   remove,
 }) => {
   const entry = useExistentTrackedValue({ id, type: EntryCodec });
   const storage = useStorage();
-  return (
+  return !showCompleted && entry.state === EntryStates.Completed ? null : (
     <Entry
       {...entry}
       setType={makeFieldSetter(storage, 'type', entry)}
