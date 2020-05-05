@@ -4,11 +4,13 @@ import { EntryCodec, EntryType, EntryTypes, EntryStates } from '../../io/entry';
 import Priority from './Priority';
 import Description from './Description';
 import StateSelector from './StateSelector';
-import { useStyle, useStyles } from '../useStyles';
+import { useStyles } from '../useStyles';
 import { Id, useStorage, DBObserver } from '../../io/db';
 import { useTrackedValue, useExistentTrackedValue } from '../../io/useTrackedValue';
 import { pipe } from 'fp-ts/lib/pipeable';
 import { fold, Option } from 'fp-ts/lib/Option';
+import { useColors } from '../../Colors';
+import { useHovered } from '../../utils';
 
 const getNewEntry = (): EntryType => {
   return ({
@@ -33,7 +35,7 @@ interface IConnected extends EntryType {
   setPriority: (p: boolean) => void;
   setDate: (date: Date) => void;
   onEnter: () => void;
-  remove?: ReactNode;
+  quickButtons?: ReactNode;
 }
 
 const Entry: React.FC<IConnected> = ({
@@ -49,7 +51,7 @@ const Entry: React.FC<IConnected> = ({
   onEnter,
   setDate,
   date,
-  remove,
+  quickButtons,
 }) => {
   const classes = useStyles({
     container: {
@@ -82,7 +84,7 @@ const Entry: React.FC<IConnected> = ({
         <input type="date" value={dateValue} onChange={e => setDate(new Date(e.target.valueAsNumber))} /> :
         <span className={classes.date}>{date.toLocaleDateString()}</span>
       }
-      {remove && remove}
+      {quickButtons && quickButtons}
     </div>
   );
 };
@@ -155,23 +157,78 @@ const makeFieldSetter = <K extends keyof EntryType>(db: DBObserver, field: K, en
   };
 };
 
+const ButtonBase = {
+  outline: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  background: 'inherit',
+  margin: '0',
+  minHeight: '30px',
+  minWidth: '30px',
+  maxHeight: '30px',
+  maxWidth: '30px',
+  marginRight: '4px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '100%',
+} as const;
+
 export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: boolean }> = ({
   id,
   showCompleted,
   remove,
 }) => {
+  const colors = useColors();
+  const [hovered, ref] = useHovered();
+  const classes = useStyles({
+    remove: {
+      ...ButtonBase,
+      ':hover': {
+        background: colors.orange,
+        color: colors.white,
+      },
+    },
+    complete: {
+      ...ButtonBase,
+      fontSize: '0.8em',
+      ':hover': {
+        background: colors.green,
+        color: colors.white,
+      },
+    },
+    quickButtons: {
+      width: hovered ? '70px' : '0px',
+      overflow: 'hidden',
+      transition: 'width 300ms ease-in-out',
+      display: 'flex',
+      justifyContent: 'space-around',
+    },
+  });
   const entry = useExistentTrackedValue({ id, type: EntryCodec });
   const storage = useStorage();
+  const setState = makeFieldSetter(storage, 'state', entry);
+  const quickButtons = (
+    <div className={classes.quickButtons}>
+      {entry.state !== EntryStates.Completed &&
+        <button className={classes.complete} onClick={() => setState(EntryStates.Completed)}>✓</button>
+      }
+      <button className={classes.remove} onClick={remove}>X</button>
+    </div>
+  );
+
   return !showCompleted && entry.state === EntryStates.Completed ? null : (
-    <Entry
-      {...entry}
-      setType={makeFieldSetter(storage, 'type', entry)}
-      setState={makeFieldSetter(storage, 'state', entry)}
-      setDesc={makeFieldSetter(storage, 'description', entry)}
-      setPriority={makeFieldSetter(storage, 'priority', entry)}
-      setDate={makeFieldSetter(storage, 'date', entry)}
-      onEnter={() => {}}
-      remove={<button onClick={remove}>Delete</button>}
-    />
+    <div ref={ref}>
+      <Entry
+        {...entry}
+        setType={makeFieldSetter(storage, 'type', entry)}
+        setState={setState}
+        setDesc={makeFieldSetter(storage, 'description', entry)}
+        setPriority={makeFieldSetter(storage, 'priority', entry)}
+        setDate={makeFieldSetter(storage, 'date', entry)}
+        onEnter={() => {}}
+        quickButtons={quickButtons}
+      />
+    </div>
   );
 };
