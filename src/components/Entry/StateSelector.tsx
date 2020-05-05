@@ -131,6 +131,7 @@ const StateSelector: React.FC<IProps> = ({
               opacity: isSelected ? 1 : 0.7,
               cursor: isSelected ? 'no-drop' : 'pointer',
               background: isSelected && hovered ? colors.orange : undefined,
+              color: !hovered && isSelected && op === EntryTypes.Note ? colors.darkgreen : 'inherit',
             }}
           >
             {Symbols[op]}

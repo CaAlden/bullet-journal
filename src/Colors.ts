@@ -5,6 +5,7 @@ interface IColors {
   white: string;
   blue: string;
   green: string;
+  darkgreen: string;
   orange: string;
 }
 
@@ -13,6 +14,7 @@ const colorContext = createContext<IColors>({
   white: '#F5EFED',
   blue: '#2292A4',
   green: '#BDBF09',
+  darkgreen: 'green',
   orange: '#D96C06',
 });
 
