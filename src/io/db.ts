@@ -79,7 +79,6 @@ export class DBObserver implements IDbInteractor {
 
     // Returns an unsubscribe function.
     return () => {
-      console.log('called!');
       this.subscriptions.set(
         id,
         pipe(
