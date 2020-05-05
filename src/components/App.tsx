@@ -16,6 +16,7 @@ import NewPageInput from './NewPageInput';
 import { useColors } from '../Colors';
 import { useLastVisited } from '../session';
 import { identity } from 'fp-ts/lib/function';
+import { Button } from './Button';
 
 export const REGISTRY_KEY = '__type_registry';
 export const RegistryCodec = JSONCodec.pipe(t.interface({
@@ -202,7 +203,9 @@ export default function App() {
                 selected={selected === id}
                 id={id}
               />
-              <button
+              <Button
+                hoverColor={colors.white}
+                hoverBackground={colors.orange}
                 onClick={() => {
                   removePage(id)();
                   if (selected === id) {
@@ -217,7 +220,7 @@ export default function App() {
                     );
                   }
                 }}
-              >X</button>
+              >X</Button>
             </li>
           ))}</ul>
         }

@@ -21,20 +21,22 @@ export const ButtonBase = {
 export const Button: React.FC<{
   hoverColor: string;
   hoverBackground: string;
+  disabled?: boolean;
 } & React.HTMLAttributes<HTMLButtonElement>> = ({
   hoverColor,
   hoverBackground,
+  disabled,
   ...props
 }) => {
   const className = useStyle({
     ...ButtonBase,
     ':hover': {
-      color: hoverColor,
-      background: hoverBackground,
+      color: disabled ? 'inherit' : hoverColor,
+      background: disabled ? '#ddd' : hoverBackground,
     },
   });
 
   return (
-    <button type="button" className={className} {...props} />
+    <button type="button" className={className} disabled={disabled} {...props} />
   );
 }

@@ -3,6 +3,8 @@ import { IPage } from '../io/page';
 import { v4 } from 'uuid';
 import { useStyles } from './useStyles';
 import { IO } from 'fp-ts/lib/IO';
+import { Button } from './Button';
+import { useColors } from '../Colors';
 
 interface IProps {
   onNew: (page: IPage) => IO<void>;
@@ -41,11 +43,20 @@ const NewPageInput: React.FC<IProps> = ({ onNew }) => {
       background: 'inherit',
     },
   });
-
+  const colors = useColors();
   return (
     <div className={classes.container}>
       <input className={classes.input} value={name} onChange={e => setName(e.target.value)} placeholder="Input new page name"/>
-      <button disabled={name === ''} onClick={onSubmit}>+</button>
+      <Button
+        hoverColor={colors.white}
+        hoverBackground={colors.green}
+        disabled={name === ''}
+        onClick={onSubmit}
+        style={{
+          fontSize: '1.25em',
+          fontWeight: 'bold',
+        }}
+      >+</Button>
     </div>
   );
 };
