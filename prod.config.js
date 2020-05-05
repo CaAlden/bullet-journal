@@ -1,12 +1,7 @@
 const path = require('path');
-const outputPath = path.resolve(__dirname, 'dist');
+const outputPath = path.resolve(__dirname, 'docs');
 module.exports = {
   mode: "production",
-  // Enable sourcemaps for debugging webpack's output.
-  devtool: "source-map",
-  devServer: {
-    hot: true,
-  },
   entry: './src/index.tsx',
   output: {
     filename: 'main.js',

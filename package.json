@@ -18,9 +18,9 @@
     "webpack-cli": "^3.3.11"
   },
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack --watch",
-    "start": "webpack-dev-server --no-inline",
+    "build": "webpack --config prod.config.js",
+    "watch": "webpack --watch --config dev.config.js",
+    "start": "webpack-dev-server --no-inline --config dev.config.js",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch"
   },

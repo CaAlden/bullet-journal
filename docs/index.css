@@ -1,0 +1,26 @@
+/*
+ * index.css
+ * Copyright (C) 2020 campbell
+ *
+ * Distributed under terms of the MIT license.
+ */
+
+html, #app {
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+}
+body {
+  min-height: 100vh;
+  min-width: 100vw;
+  margin: 0;
+  font-family: 'Patrick Hand', cursive;
+}
+
+h1 {
+  font-family: 'Permanent Marker', cursive;
+}
+
+div {
+  box-sizing: border-box;
+}
