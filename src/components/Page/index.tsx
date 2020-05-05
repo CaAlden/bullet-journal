@@ -80,6 +80,7 @@ const Page: React.FC<{ id: Id }> = ({
       border: 'none',
       fontSize: '2em',
       fontFamily: 'Permanent Marker',
+      flexGrow: 1,
     },
     label: {
       padding: '0 5px',
