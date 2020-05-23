@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ReactNode } from 'react';
+import React, { useState, useCallback, ReactNode, useEffect, useRef } from 'react';
 import { v4 } from 'uuid';
 import { EntryCodec, EntryType, EntryTypes, EntryStates } from '../../io/entry';
 import Priority from './Priority';
@@ -27,6 +27,7 @@ const getNewEntry = (): EntryType => {
 interface IProps {
   onNew: (entry: EntryType) => void;
   remove?: ReactNode;
+  pageId: Id;
 }
 
 interface IConnected extends EntryType {
@@ -90,7 +91,7 @@ const Entry: React.FC<IConnected> = ({
   );
 };
 
-export const AddEntry: React.FC<IProps> = ({ onNew }) => {
+export const AddEntry: React.FC<IProps> = ({ onNew, pageId }) => {
   const [id, setId] = useState(v4());
   const [type, setType] = useState(EntryTypes.Task);
   const [desc, setDesc] = useState('');
@@ -106,6 +107,31 @@ export const AddEntry: React.FC<IProps> = ({ onNew }) => {
     setPriority(defaults.priority);
     setDate(defaults.date);
   };
+
+  const oldPage = useRef(pageId);
+  const doCreate = () => {
+    // Only create new entries if they have a description
+    if (desc !== '') {
+      onNew({
+        id,
+        type,
+        description: desc,
+        state: status,
+        priority,
+        date,
+      });
+      resetValues();
+    }
+  };
+
+  useEffect(() => {
+    if (oldPage.current !== pageId) {
+      oldPage.current = pageId;
+      // Automatically create a task if someone navigates away.
+      doCreate();
+    }
+  }, [pageId]);
+
   return (
     <Entry
       id={id}
@@ -119,17 +145,7 @@ export const AddEntry: React.FC<IProps> = ({ onNew }) => {
       setPriority={setPriority}
       date={date}
       setDate={setDate}
-      onEnter={() => {
-        onNew({
-          id,
-          type,
-          description: desc,
-          state: status,
-          priority,
-          date,
-        });
-        resetValues();
-      }}
+      onEnter={doCreate}
     />
   );
 };
