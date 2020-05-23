@@ -189,6 +189,16 @@ export default function App() {
     )(lastVisited);
 
   const [selected, setSelected] = useState<null | Id>(initial);
+
+  const doPageCreation = (page: IPage): IO<void> => {
+    return pipe(
+      addPage(page),
+      map(() => {
+        setSelected(page.id);
+      }),
+    );
+  }
+
   return (
     <div className={appStyles.page}>
       <div className={appStyles.side}>
@@ -224,7 +234,7 @@ export default function App() {
             </li>
           ))}</ul>
         }
-        <NewPageInput onNew={addPage} />
+        <NewPageInput onNew={doPageCreation} />
       </div>
       <main className={appStyles.main}>
         {selected !== null &&
