@@ -6,12 +6,14 @@ export enum EntryTypes {
   Task = 'task',
   Event = 'event',
   Note = 'note',
+  Question = 'question',
 }
 
 const EntryTypeCodec = iots.keyof({
   [EntryTypes.Task]: null,
   [EntryTypes.Event]: null,
   [EntryTypes.Note]: null,
+  [EntryTypes.Question]: null,
 });
 
 export enum EntryStates {

@@ -26,6 +26,7 @@ const Center: React.FC<{ offset?: number }> = ({ children, offset = 6 }) => {
 const Symbols: { [K in EntryTypes | EntryStates]: ReactNode } = {
   [EntryTypes.Task]: <Center offset={4}>●</Center>,
   [EntryTypes.Note]: <Center offset={4}>—</Center>,
+  [EntryTypes.Question]: '?',
   [EntryTypes.Event]: <Center>▲</Center>,
   [EntryStates.Pushed]: <Center>{'<'}</Center>,
   [EntryStates.Migrated]: <Center>{'>'}</Center>,
@@ -50,6 +51,7 @@ const StateButton: React.FC<{
 const types = [
   EntryTypes.Task,
   EntryTypes.Note,
+  EntryTypes.Question,
   EntryTypes.Event,
 ];
 const states = [
@@ -61,7 +63,7 @@ const states = [
 ];
 
 const isType = (x: unknown): x is EntryTypes => {
-  return x === EntryTypes.Task || x === EntryTypes.Event || x === EntryTypes.Note;
+  return x === EntryTypes.Task || x === EntryTypes.Event || x === EntryTypes.Note || x === EntryTypes.Question;
 }
 
 const StateSelector: React.FC<IProps> = ({

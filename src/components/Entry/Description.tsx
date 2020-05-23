@@ -71,7 +71,8 @@ const Description: React.FC<IProps> = ({
     }
   };
   const placeholder = type === EntryTypes.Task ? "Add a task" :
-    type === EntryTypes.Note ? 'Write a note' : 'Enter an event';
+    type === EntryTypes.Note ? 'Write a note' :
+    type === EntryTypes.Question ? 'Ask a question' : 'Enter an event';
 
   return (
     <input
