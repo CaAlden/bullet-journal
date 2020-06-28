@@ -8,6 +8,7 @@ const Droppable = Symbol('Droppable');
 interface IDroppable {
   type: typeof Droppable;
   id: string;
+  pos: number;
 }
 
 interface ICellProps {
@@ -28,19 +29,36 @@ const DragDropCell: FC<ICellProps> = ({ children, id, pos, reorder }) => {
     drop: (item) => {
       reorder(item.id, pos);
     },
-    collect: (monitor) => ({
-      background: '#ddd',
-      paddingTop: monitor.isOver() ? '40px' : '0',
-      transition: 'padding 250ms ease-in-out',
-    }),
-  });
-
-  const [dragging, drag] = useDrag({
-    item: { id, type: Droppable },
+    collect: (monitor) => {
+      const item = monitor.getItem();
+      const draggingFromAbove = item && item.pos < pos;
+      const draggingFromBelow = item && item.pos > pos;
+      return ({
+        background: '#ddd',
+        ...(draggingFromAbove && {
+          paddingBottom: monitor.isOver() ? '40px' : '0',
+        }),
+        ...(draggingFromBelow && {
+          paddingTop: monitor.isOver() ? '40px' : '0',
+        }),
+        transition: 'padding 250ms ease-in-out',
+      });
+    },
   });
 
   const colors = useColors();
 
+  const [dragging, drag] = useDrag({
+    item: { id, type: Droppable, pos },
+    collect: (monitor) => ({
+      background: colors.white,
+      cursor: 'grab',
+      opacity: monitor.isDragging() ? 0.2 : 1,
+      transition: 'opacity 100ms ease-in-out',
+    }),
+  });
+
+  console.log()
   return (
     <div
       style={{
@@ -52,8 +70,7 @@ const DragDropCell: FC<ICellProps> = ({ children, id, pos, reorder }) => {
       <div
         style={{
           ...FLEX,
-          background: colors.white,
-          cursor: 'grab',
+          ...dragging,
         }}
         ref={drag}
       >
@@ -88,8 +105,10 @@ const DragList: FC<IProps> = ({ items, setItems }) => {
 
   return (
     <div style={FLEX}>{
-      items.map(({ id, element }, pos) => <DragDropCell key={id} id={id} pos={pos} reorder={reorder} children={element} />)
-    }</div>
+      items.map(({ id, element }, pos) =>
+        <DragDropCell key={id} id={id} pos={pos} reorder={reorder} children={element} />
+      )}
+    </div>
   );
 };
 
