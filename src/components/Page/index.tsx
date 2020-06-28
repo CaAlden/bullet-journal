@@ -8,6 +8,7 @@ import { pipe } from 'fp-ts/lib/pipeable';
 import { fold } from 'fp-ts/lib/Option';
 import { useStyles } from '../useStyles';
 import { chain } from 'fp-ts/lib/IO';
+import DragList from '../DragDrop/DragList';
 
 const usePage = (id: Id) => {
   const storage = useStorage();
@@ -40,11 +41,20 @@ const usePage = (id: Id) => {
     };
     return storage.serialize(nextPage, PageCodec);
   }
+
+  const setTasks = (tasks: Id[]) => {
+    storage.serialize({
+      ...page,
+      tasks,
+    }, PageCodec)();
+  }
+
   return ({
     page,
     setName,
     addEntry,
     removeEntry,
+    setTasks,
   });
 };
 
@@ -57,6 +67,7 @@ const Page: React.FC<{ id: Id }> = ({
     removeEntry,
     addEntry,
     setName,
+    setTasks,
   } = usePage(id);
   const classes = useStyles({
     main: {
@@ -87,6 +98,11 @@ const Page: React.FC<{ id: Id }> = ({
     },
   });
 
+  const editableEntries = page.tasks.map(id => ({
+    id,
+    element: <EditEntry id={id} remove={removeEntry(id)} showCompleted={showCompleted} />,
+  }));
+
   return (
     <div className={classes.main}>
       <div className={classes.header}>
@@ -96,9 +112,7 @@ const Page: React.FC<{ id: Id }> = ({
           <input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} />
         </div>
       </div>
-      {page.tasks.map((id) =>
-        <EditEntry id={id} key={id} remove={removeEntry(id)} showCompleted={showCompleted}/>
-      )}
+      <DragList items={editableEntries} setItems={setTasks} />
       <AddEntry pageId={id} onNew={e => {
         if (e.type !== EntryTypes.Event) {
           // For now, we always want to have the most up to date submit date as possible (but events care a bit more about the date)
