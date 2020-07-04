@@ -5,16 +5,20 @@
  * Distributed under terms of the MIT license.
  */
 
-html, #app {
+html {
   min-height: 100vh;
-  min-width: 100vw;
   display: flex;
 }
 body {
   min-height: 100vh;
-  min-width: 100vw;
+  width: 100%;
   margin: 0;
   font-family: 'Patrick Hand', cursive;
+}
+
+#app {
+  display: flex;
+  min-height: 100vh;
 }
 
 h1 {
