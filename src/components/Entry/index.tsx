@@ -58,6 +58,7 @@ const Entry: React.FC<IConnected> = ({
   const classes = useStyles({
     container: {
       display: 'flex',
+      flexGrow: 1,
       alignItems: 'center',
       fontSize: '1.5em',
       background: state === EntryStates.Completed ? '#ddd' : 'inherit',
@@ -189,6 +190,10 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: bo
       display: 'flex',
       justifyContent: 'space-around',
     },
+    wrapper: {
+      display: 'flex',
+      flexGrow: 1,
+    },
   });
   const entry = useExistentTrackedValue({ id, type: EntryCodec });
   const storage = useStorage();
@@ -210,7 +215,7 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: bo
   );
 
   return !showCompleted && entry.state === EntryStates.Completed ? null : (
-    <div ref={ref}>
+    <div ref={ref} className={classes.wrapper}>
       <Entry
         {...entry}
         setType={makeFieldSetter(storage, 'type', entry)}

@@ -2,6 +2,8 @@ import React, { FC, ReactElement } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Id } from '../../io/db';
 import { useColors } from '../../Colors';
+import Handle from './Handle';
+import { useHovered } from '../../utils';
 
 const Droppable = Symbol('Droppable');
 
@@ -24,6 +26,7 @@ const FLEX = {
 } as const;
 
 const DragDropCell: FC<ICellProps> = ({ children, id, pos, reorder }) => {
+  const [hovered, hoverRef] = useHovered();
   const [dropStyles, drop] = useDrop<IDroppable, void, any>({
     accept: Droppable,
     drop: (item) => {
@@ -48,33 +51,52 @@ const DragDropCell: FC<ICellProps> = ({ children, id, pos, reorder }) => {
 
   const colors = useColors();
 
-  const [dragging, drag] = useDrag({
+  const [dragging, drag, preview] = useDrag({
     item: { id, type: Droppable, pos },
     collect: (monitor) => ({
-      background: colors.white,
-      cursor: 'grab',
-      opacity: monitor.isDragging() ? 0.2 : 1,
-      transition: 'opacity 100ms ease-in-out',
+      originStyles: {
+        background: colors.white,
+        opacity: monitor.isDragging() ? 0.2 : 1,
+        transition: 'opacity 100ms ease-in-out',
+      },
     }),
   });
 
   console.log()
   return (
-    <div
-      style={{
-        ...FLEX,
-        ...dropStyles,
-      }}
-      ref={drop}
-    >
+    <div ref={preview}>
       <div
         style={{
           ...FLEX,
-          ...dragging,
+          ...dropStyles,
         }}
-        ref={drag}
+        ref={drop}
       >
-        {children}
+        <div
+          ref={hoverRef}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexGrow: 1,
+            paddingLeft: '10px',
+            ...dragging.originStyles,
+          }}
+        >
+          <span
+            ref={drag}
+            style={{
+              height: '20px',
+              width: '10px',
+              opacity: hovered ? 1 : 0,
+              transition: 'opacity 250ms linear',
+              cursor: 'grab',
+            }}>
+            <Handle />
+          </span>
+          <div style={{ display: 'flex', flexGrow: 1 }}>
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );

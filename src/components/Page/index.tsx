@@ -96,6 +96,9 @@ const Page: React.FC<{ id: Id }> = ({
     label: {
       padding: '0 5px',
     },
+    addEntryContainer: {
+      paddingLeft: '20px',
+    },
   });
 
   const editableEntries = page.tasks.map(id => ({
@@ -113,15 +116,17 @@ const Page: React.FC<{ id: Id }> = ({
         </div>
       </div>
       <DragList items={editableEntries} setItems={setTasks} />
-      <AddEntry pageId={id} onNew={e => {
-        if (e.type !== EntryTypes.Event) {
-          // For now, we always want to have the most up to date submit date as possible (but events care a bit more about the date)
-          e.date = new Date();
-        }
-        const addIO = addEntry(e);
-        // Immediately perform the IO.
-        addIO();
-      }} />
+      <div className={classes.addEntryContainer}>
+        <AddEntry pageId={id} onNew={e => {
+          if (e.type !== EntryTypes.Event) {
+            // For now, we always want to have the most up to date submit date as possible (but events care a bit more about the date)
+            e.date = new Date();
+          }
+          const addIO = addEntry(e);
+          // Immediately perform the IO.
+          addIO();
+        }} />
+      </div>
     </div>
   );
 };
