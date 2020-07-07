@@ -5,6 +5,7 @@ import { useStyles } from './useStyles';
 import { IO } from 'fp-ts/lib/IO';
 import { Button } from './Button';
 import { useColors } from '../Colors';
+import { useOnEnter } from '../utils';
 
 interface IProps {
   onNew: (page: IPage) => IO<void>;
@@ -44,9 +45,10 @@ const NewPageInput: React.FC<IProps> = ({ onNew }) => {
     },
   });
   const colors = useColors();
+  const enterCallbackRef = useOnEnter(onSubmit);
   return (
     <div className={classes.container}>
-      <input className={classes.input} value={name} onChange={e => setName(e.target.value)} placeholder="Input new page name"/>
+      <input className={classes.input} ref={enterCallbackRef} value={name} onChange={e => setName(e.target.value)} placeholder="Input new page name"/>
       <Button
         hoverColor={colors.white}
         hoverBackground={colors.green}
