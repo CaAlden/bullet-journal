@@ -47,3 +47,48 @@ export const useHovered = (): [boolean, (node: null | HTMLElement) => void] => {
 
   return [hovered, cbkRef];
 };
+
+export const useOnEnter = (onEnter: () => void) => {
+  const nodeRef = useRef<HTMLElement>(null);
+  const listenerRef = useRef((e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onEnter();
+    }
+  });
+  const isMounted = useRef(true);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isMounted.current && nodeRef.current) {
+      nodeRef.current.removeEventListener('keydown', listenerRef.current);
+      listenerRef.current = (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+          onEnter();
+        }
+      };
+      nodeRef.current.addEventListener('keydown', listenerRef.current);
+    }
+  }, [onEnter]);
+
+  const callback = (node: HTMLElement | null) => {
+    if (node === null) {
+      if (nodeRef.current && isMounted.current) {
+        nodeRef.current.removeEventListener('keydown', listenerRef.current);
+        nodeRef.current = null;
+      }
+    } else if (isMounted.current) {
+      if (nodeRef.current) {
+        nodeRef.current.removeEventListener('keydown', listenerRef.current);
+      }
+      nodeRef.current = node;
+      nodeRef.current.addEventListener('keydown', listenerRef.current);
+    }
+  };
+
+  return callback;
+};
