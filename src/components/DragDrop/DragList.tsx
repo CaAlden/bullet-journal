@@ -4,6 +4,7 @@ import { Id } from '../../io/db';
 import { useColors } from '../../Colors';
 import Handle from './Handle';
 import { useHovered } from '../../utils';
+import { useStyles } from '../useStyles';
 
 const Droppable = Symbol('Droppable');
 
@@ -61,8 +62,16 @@ const DragDropCell: FC<ICellProps> = ({ children, id, pos, reorder }) => {
       },
     }),
   });
-
-  console.log()
+  const classes = useStyles({
+    handleContainer: {
+      width: '10px',
+      height: '15px',
+      position: 'absolute',
+      top: '15px',
+      left: '5px',
+      cursor: 'grab',
+    },
+  });
   return (
     <div ref={preview}>
       <div
@@ -78,22 +87,17 @@ const DragDropCell: FC<ICellProps> = ({ children, id, pos, reorder }) => {
             display: 'flex',
             alignItems: 'center',
             flexGrow: 1,
-            paddingLeft: '10px',
+            paddingLeft: '20px',
+            position: 'relative',
             ...dragging.originStyles,
           }}
         >
-          <span
+          <div
             ref={drag}
-            style={{
-              display: 'flex',
-              maxHeight: '20px',
-              maxWidth: '10px',
-              opacity: hovered ? 1 : 0,
-              transition: 'opacity 250ms linear',
-              cursor: 'grab',
-            }}>
-            <Handle />
-          </span>
+            className={classes.handleContainer}
+          >
+            <Handle opacity={hovered ? 1 : 0} style={{ transition: 'opacity 250ms linear' }} />
+          </div>
           <div style={{ display: 'flex', flexGrow: 1 }}>
             {children}
           </div>
