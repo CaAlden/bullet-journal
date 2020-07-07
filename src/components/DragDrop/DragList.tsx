@@ -85,8 +85,9 @@ const DragDropCell: FC<ICellProps> = ({ children, id, pos, reorder }) => {
           <span
             ref={drag}
             style={{
-              height: '20px',
-              width: '10px',
+              display: 'flex',
+              maxHeight: '20px',
+              maxWidth: '10px',
               opacity: hovered ? 1 : 0,
               transition: 'opacity 250ms linear',
               cursor: 'grab',
