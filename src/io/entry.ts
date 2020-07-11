@@ -46,7 +46,7 @@ interface IEntry {
   state: EntryStates;
 }
 
-export const EntryCodec: iots.Type<IEntry, string, string> = JSONCodec.pipe(iots.interface({
+export const EntryCodec: iots.Type<IEntry, string, string> = JSONCodec.pipe(iots.type({
   id: iots.string,
   type: EntryTypeCodec,
   description: iots.string,

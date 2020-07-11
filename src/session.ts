@@ -9,7 +9,7 @@ import { IO } from 'fp-ts/lib/IO';
 
 export const LAST_PAGE_KEY = '__last_visited';
 const RefCodec = JSONCodec.pipe(
-  t.interface({
+  t.type({
     id: t.string,
     ref: t.union([t.string, t.null]),
   }),

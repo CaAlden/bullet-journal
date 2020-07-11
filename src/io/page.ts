@@ -11,7 +11,7 @@ export interface IPage {
   tasks: Id[];
 }
 
-export const PageCodec: iots.Type<IPage, string, string> = JSONCodec.pipe(iots.interface({
+export const PageCodec: iots.Type<IPage, string, string> = JSONCodec.pipe(iots.type({
   id: iots.string,
   name: iots.string,
   start: DateCodec,

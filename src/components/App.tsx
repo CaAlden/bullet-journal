@@ -19,7 +19,7 @@ import { identity } from 'fp-ts/lib/function';
 import { Button } from './Button';
 
 export const REGISTRY_KEY = '__type_registry';
-export const RegistryCodec = JSONCodec.pipe(t.interface({
+export const RegistryCodec = JSONCodec.pipe(t.type({
   id: t.string,
   types: t.record(t.string, t.array(t.union([t.string, t.undefined]))),
 }));
