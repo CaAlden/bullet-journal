@@ -17,6 +17,7 @@ import { useColors } from '../Colors';
 import { useLastVisited } from '../session';
 import { identity } from 'fp-ts/lib/function';
 import { Button } from './Button';
+import Navigation from './Navigation/Navigation';
 
 export const REGISTRY_KEY = '__type_registry';
 export const RegistryCodec = JSONCodec.pipe(t.type({
@@ -135,10 +136,15 @@ export default function App() {
   const { registry, addPage, removePage } = useRegistry();
   const colors = useColors();
   const appStyles = useStyles({
-    page: {
+    outer: {
       flexGrow: 1,
+      display: 'flex',
+      flexDirection: 'column',
       color: colors.black,
       background: colors.white,
+    },
+    page: {
+      flexGrow: 1,
       padding: '1em',
       display: 'grid',
       gridTemplateColumns: '200px 1fr',
@@ -200,47 +206,50 @@ export default function App() {
   }
 
   return (
-    <div className={appStyles.page}>
-      <div className={appStyles.side}>
-        {!pages ? null :
-          <ul className={appStyles.list}>{pages.map((id) => (
-            <li className={appStyles.listElm} key={id}>
-              <PageLink
-                onClick={() => {
-                  setSelected(id);
-                  setLastVisited(id)();
-                }}
-                selected={selected === id}
-                id={id}
-              />
-              <Button
-                hoverColor={colors.white}
-                hoverBackground={colors.orange}
-                onClick={() => {
-                  removePage(id)();
-                  if (selected === id) {
-                    setSelected(null);
-                    pipe(
-                      lastVisited,
-                      fold(() => {}, (last) => {
-                        if (last === id) {
-                          setLastVisited(null)();
-                        }
-                      }),
-                    );
-                  }
-                }}
-              >X</Button>
-            </li>
-          ))}</ul>
-        }
-        <NewPageInput onNew={doPageCreation} />
+    <div className={appStyles.outer}>
+      <Navigation />
+      <div className={appStyles.page}>
+        <div className={appStyles.side}>
+          {!pages ? null :
+            <ul className={appStyles.list}>{pages.map((id) => (
+              <li className={appStyles.listElm} key={id}>
+                <PageLink
+                  onClick={() => {
+                    setSelected(id);
+                    setLastVisited(id)();
+                  }}
+                  selected={selected === id}
+                  id={id}
+                />
+                <Button
+                  hoverColor={colors.white}
+                  hoverBackground={colors.orange}
+                  onClick={() => {
+                    removePage(id)();
+                    if (selected === id) {
+                      setSelected(null);
+                      pipe(
+                        lastVisited,
+                        fold(() => {}, (last) => {
+                          if (last === id) {
+                            setLastVisited(null)();
+                          }
+                        }),
+                      );
+                    }
+                  }}
+                >X</Button>
+              </li>
+            ))}</ul>
+          }
+          <NewPageInput onNew={doPageCreation} />
+        </div>
+        <main className={appStyles.main}>
+          {selected !== null &&
+            <Page id={selected} />
+          }
+        </main>
       </div>
-      <main className={appStyles.main}>
-        {selected !== null &&
-          <Page id={selected} />
-        }
-      </main>
     </div>
   );
 }
