@@ -88,6 +88,7 @@ const DragDropCell: FC<ICellProps> = ({ children, id, pos, reorder }) => {
             alignItems: 'center',
             flexGrow: 1,
             paddingLeft: '20px',
+            overflow: 'hidden',
             position: 'relative',
             ...dragging.originStyles,
           }}
