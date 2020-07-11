@@ -6,7 +6,7 @@ import Description from './Description';
 import StateSelector from './StateSelector';
 import { useStyles } from '../useStyles';
 import { Id, useStorage, DBObserver } from '../../io/db';
-import { useTrackedValue, useExistentTrackedValue } from '../../io/useTrackedValue';
+import { useTrackedValue, useExistentTrackedValue, makeFieldSetter } from '../../io/useTrackedValue';
 import { pipe } from 'fp-ts/lib/pipeable';
 import { fold, Option } from 'fp-ts/lib/Option';
 import { useColors } from '../../Colors';
@@ -165,16 +165,6 @@ const getAndDo = <T, R>(oT: Option<T>, f: (t: T) => R): R => {
   );
 };
 
-const makeFieldSetter = <K extends keyof EntryType>(db: DBObserver, field: K, entry: EntryType) => {
-  return (val: EntryType[K]) => {
-    const newE = {
-      ...entry,
-      [field]: val,
-    }
-    db.serialize(newE, EntryCodec)();
-  };
-};
-
 export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: boolean }> = ({
   id,
   showCompleted,
@@ -197,7 +187,7 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: bo
   });
   const entry = useExistentTrackedValue({ id, type: EntryCodec });
   const storage = useStorage();
-  const setState = makeFieldSetter(storage, 'state', entry);
+  const setState = makeFieldSetter(storage, 'state', entry, EntryCodec);
   const quickButtons = (
     <div className={classes.quickButtons}>
       {entry.state !== EntryStates.Completed &&
@@ -218,11 +208,11 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: bo
     <div ref={ref} className={classes.wrapper}>
       <Entry
         {...entry}
-        setType={makeFieldSetter(storage, 'type', entry)}
+        setType={makeFieldSetter(storage, 'type', entry, EntryCodec)}
         setState={setState}
-        setDesc={makeFieldSetter(storage, 'description', entry)}
-        setPriority={makeFieldSetter(storage, 'priority', entry)}
-        setDate={makeFieldSetter(storage, 'date', entry)}
+        setDesc={makeFieldSetter(storage, 'description', entry, EntryCodec)}
+        setPriority={makeFieldSetter(storage, 'priority', entry, EntryCodec)}
+        setDate={makeFieldSetter(storage, 'date', entry, EntryCodec)}
         onEnter={() => {}}
         quickButtons={quickButtons}
       />

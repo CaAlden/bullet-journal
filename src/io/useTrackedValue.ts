@@ -1,8 +1,24 @@
 import { useContext, useEffect, useState } from 'react';
-import { useStorage, Id, IRef, IPersistable } from './db';
+import { useStorage, Id, IRef, IPersistable, DBObserver } from './db';
 import { Option, none, fold } from 'fp-ts/lib/Option';
 import { pipe } from 'fp-ts/lib/pipeable';
 import { identity } from 'fp-ts/lib/function';
+import * as iots from 'io-ts';
+
+export const makeFieldSetter = <T extends IPersistable, K extends keyof T>(
+  db: DBObserver,
+  field: K,
+  entry: T,
+  codec: iots.Type<T, string, string>,
+) => {
+  return (val: T[K]) => {
+    const newE = {
+      ...entry,
+      [field]: val,
+    }
+    db.serialize(newE, codec)();
+  };
+};
 
 export const useTrackedValue = <T extends IPersistable>({ id, type }: IRef<T>) => {
   const db = useStorage();
