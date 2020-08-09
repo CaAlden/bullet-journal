@@ -4,6 +4,7 @@ import { io, IO, chain } from 'fp-ts/lib/IO';
 import { map } from 'fp-ts/lib/Array';
 import { pipe } from 'fp-ts/lib/pipeable';
 import * as t from 'io-ts';
+import { v4 } from 'uuid';
 /**
  * Utilities for interacting with the Local Storage as a DB.
  */
@@ -63,9 +64,19 @@ export class DBObserver implements IDbInteractor {
   };
 
   private subscriptions: Map<string, SubscriptionCallback[]>;
+  private alwaysFires: Map<string, (id: string) => void>;
   public constructor(private readonly db: DB) {
     this.subscriptions = new Map();
+    this.alwaysFires = new Map();
   }
+
+  public subscribeToSerialize = (callback: (id: string) => void): () => void => {
+    const unsubscribeId = v4();
+    this.alwaysFires.set(unsubscribeId, callback);
+    return () => {
+      this.alwaysFires.delete(unsubscribeId);
+    };
+  };
 
   public subscribe = (id: Id, callback: SubscriptionCallback): () => void => {
     this.subscriptions.set(id, pipe(
@@ -95,19 +106,29 @@ export class DBObserver implements IDbInteractor {
     };
   };
 
+  public notify = (id: string) => {
+    pipe(
+      this.subscriptions.get(id),
+      fromNullable,
+      fold(
+        () => {},
+        map((cbk) => cbk()),
+      )
+    );
+
+  };
+
   public serialize = <T extends IPersistable>(t: T, type: t.Type<T, string, string>): IO<void> => {
     return pipe(
       this.db.serialize(t, type),
       chain(() => () => {
-        pipe(
-          this.subscriptions.get(t.id),
-          fromNullable,
-          fold(
-            () => {},
-            map((cbk) => cbk()),
-          ),
-        )
+        this.notify(t.id);
       }),
+      chain(() => () => {
+        this.alwaysFires.forEach(cb => {
+          cb(t.id);
+        });
+      })
     );
   };
 

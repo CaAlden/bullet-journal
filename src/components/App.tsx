@@ -17,6 +17,7 @@ import { useColors } from '../Colors';
 import { useLastVisited } from '../session';
 import { identity } from 'fp-ts/lib/function';
 import { Button } from './Button';
+import { useSyncDBBetweenTabs } from './sync';
 
 export const REGISTRY_KEY = '__type_registry';
 export const RegistryCodec = JSONCodec.pipe(t.type({
@@ -133,6 +134,9 @@ const PageLink: React.FC<{
 
 export default function App() {
   const { registry, addPage, removePage } = useRegistry();
+  // Initialize Syncing behavior
+  useSyncDBBetweenTabs();
+
   const colors = useColors();
   const appStyles = useStyles({
     page: {
