@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
+import Delete from '@material-ui/icons/Delete';
 import { EditEntry, AddEntry } from '../Entry';
 import { useStorage, Id } from '../../io/db';
 import { PageCodec } from '../../io/page';
 import { useTrackedValue, useExistentTrackedValue } from '../../io/useTrackedValue';
-import { EntryType, EntryCodec, EntryTypes } from '../../io/entry';
+import { EntryType, EntryCodec, EntryTypes, EntryStates } from '../../io/entry';
 import { pipe } from 'fp-ts/lib/pipeable';
 import { fold } from 'fp-ts/lib/Option';
 import { useStyles } from '../useStyles';
 import { chain } from 'fp-ts/lib/IO';
 import DragList from '../DragDrop/DragList';
+import { map, filter, rights, separate } from 'fp-ts/lib/Array';
+import { fromOption, fromPredicate, left, right } from 'fp-ts/lib/Either';
+import { Tooltip } from '@material-ui/core';
 
 const usePage = (id: Id) => {
   const storage = useStorage();
@@ -42,6 +46,21 @@ const usePage = (id: Id) => {
     return storage.serialize(nextPage, PageCodec);
   }
 
+  const removeCompleted = () => {
+    pipe(
+      page.tasks,
+      map(tId => storage.deserialize({ id: tId, type: EntryCodec })()),
+      map(fromOption(null)),
+      rights,
+      map(e => e.state === EntryStates.Completed ? left(e) : right(e)),
+      separate,
+      ({ left, right }) => {
+        left.map(({ id: rId }) => storage.removeItem(rId)());
+        storage.serialize({ ...page, tasks: right.map(e => e.id) }, PageCodec)();
+      },
+    );
+  };
+
   const setTasks = (tasks: Id[]) => {
     storage.serialize({
       ...page,
@@ -54,6 +73,7 @@ const usePage = (id: Id) => {
     setName,
     addEntry,
     removeEntry,
+    removeCompleted,
     setTasks,
   });
 };
@@ -65,6 +85,7 @@ const Page: React.FC<{ id: Id }> = ({
   const {
     page,
     removeEntry,
+    removeCompleted,
     addEntry,
     setName,
     setTasks,
@@ -99,6 +120,11 @@ const Page: React.FC<{ id: Id }> = ({
     addEntryContainer: {
       paddingLeft: '20px',
     },
+    actions: {
+      display: 'flex',
+      gridTemplateColumns: '1fr 20px',
+      gap: '10px',
+    },
   });
 
   const editableEntries = page.tasks.map(id => ({
@@ -110,9 +136,14 @@ const Page: React.FC<{ id: Id }> = ({
     <div className={classes.main}>
       <div className={classes.header}>
         <input className={classes.name} value={page.name} onChange={e => setName(e.target.value)}/>
-        <div>
-          <label className={classes.label}>Show Completed</label>
-          <input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} />
+        <div className={classes.actions}>
+          <div>
+            <label className={classes.label}>Show Completed</label>
+            <input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} />
+          </div>
+          <Tooltip title="Delete all completed entries">
+            <Delete style={{ height: '20px', width: '20px', cursor: 'pointer' }} onClick={removeCompleted} />
+          </Tooltip>
         </div>
       </div>
       <DragList items={editableEntries} setItems={setTasks} />
