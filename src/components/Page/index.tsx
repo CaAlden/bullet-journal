@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Delete from '@material-ui/icons/Delete';
 import { EditEntry, AddEntry } from '../Entry';
 import { useStorage, Id } from '../../io/db';
@@ -12,7 +12,7 @@ import { chain } from 'fp-ts/lib/IO';
 import DragList from '../DragDrop/DragList';
 import { map, filter, rights, separate } from 'fp-ts/lib/Array';
 import { fromOption, fromPredicate, left, right } from 'fp-ts/lib/Either';
-import { Tooltip } from '@material-ui/core';
+import { Tooltip, Snackbar } from '@material-ui/core';
 import { Button } from '../Button';
 import { useColors } from '../../Colors';
 
@@ -130,6 +130,22 @@ const Page: React.FC<{ id: Id }> = ({
   });
 
   const colors = useColors();
+  const [showDeleted, setShowDeleted] = useState(false);
+  const removeCompletedAction = () => {
+    removeCompleted();
+    setShowDeleted(true);
+  };
+
+  useEffect(() => {
+    if (showDeleted) {
+      const timeout = setTimeout(() => {
+        setShowDeleted(false);
+      }, 3000);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  });
 
   const editableEntries = page.tasks.map(id => ({
     id,
@@ -145,7 +161,7 @@ const Page: React.FC<{ id: Id }> = ({
             <label className={classes.label}>Show Completed</label>
             <input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} />
           </div>
-            <Button onClick={removeCompleted} hoverBackground={colors.orange} hoverColor={colors.white}>
+            <Button onClick={removeCompletedAction} hoverBackground={colors.orange} hoverColor={colors.white}>
               <Tooltip title="Delete all completed entries">
                 <Delete style={{ height: '20px', width: '20px', cursor: 'pointer' }} />
               </Tooltip>
@@ -164,6 +180,13 @@ const Page: React.FC<{ id: Id }> = ({
           addIO();
         }} />
       </div>
+      <Snackbar
+        open={showDeleted}
+        autoHideDuration={3000}
+        onClose={() => setShowDeleted(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        message="Completed entries were deleted!"
+      />
     </div>
   );
 };
