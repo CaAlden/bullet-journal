@@ -12,6 +12,8 @@ import { fold, Option } from 'fp-ts/lib/Option';
 import { useColors } from '../../Colors';
 import { useHovered } from '../../utils';
 import { Button } from '../Button';
+import ClearIcon from '@material-ui/icons/Clear';
+import CheckIcon from '@material-ui/icons/Check';
 
 const getNewEntry = (): EntryType => {
   return ({
@@ -198,9 +200,9 @@ export const EditEntry: React.FC<{ id: Id, remove: () => void; showCompleted: bo
           style={{
             fontSize: '0.8em',
           }}
-        >✓</Button>
+        ><CheckIcon/></Button>
       }
-      <Button hoverColor={colors.white} hoverBackground={colors.orange} onClick={remove}>X</Button>
+      <Button hoverColor={colors.white} hoverBackground={colors.orange} onClick={remove}><ClearIcon /></Button>
     </div>
   );
 

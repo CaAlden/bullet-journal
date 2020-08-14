@@ -1,9 +1,19 @@
 import React, { useState, useCallback, useEffect, useRef, ReactNode, useMemo } from 'react';
+import ChangeHistory from '@material-ui/icons/ChangeHistory';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import HelpIcon from '@material-ui/icons/Help';
+import NoteIcon from '@material-ui/icons/Note';
+import RestoreIcon from '@material-ui/icons/Restore';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import StrikethroughSIcon from '@material-ui/icons/StrikethroughS';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import { EntryStates, EntryTypes } from '../../io/entry';
 import { useStyle, useStyles } from '../useStyles';
 import { useHovered } from '../../utils';
 import { useColors } from '../../Colors';
 import { Button } from '../Button';
+import { Tooltip } from '@material-ui/core';
 
 interface IProps {
   state: EntryStates;
@@ -12,27 +22,70 @@ interface IProps {
   setType: (type: EntryTypes) => void;
 }
 
-const Center: React.FC<{ offset?: number }> = ({ children, offset = 6 }) => {
+const IconContainer: React.FC<{ padding?: string; tip: string }> = ({ children, padding = '0', tip }) => {
   const style = useStyle({
-    paddingBottom: `${offset}px`,
     lineHeight: 0,
+    padding,
   });
 
   return (
-    <span className={style}>{children}</span>
+    <Tooltip title={tip} enterNextDelay={1000} enterDelay={1000} leaveDelay={200}>
+      <span className={style}>{children}</span>
+    </Tooltip>
   );
 };
 
+const ICON_STYLE = {
+  height: '20px',
+  width: '20px',
+};
+
 const Symbols: { [K in EntryTypes | EntryStates]: ReactNode } = {
-  [EntryTypes.Task]: <Center offset={4}>●</Center>,
-  [EntryTypes.Note]: <Center offset={4}>—</Center>,
-  [EntryTypes.Question]: '?',
-  [EntryTypes.Event]: <Center>▲</Center>,
-  [EntryStates.Pushed]: <Center>{'<'}</Center>,
-  [EntryStates.Migrated]: <Center>{'>'}</Center>,
-  [EntryStates.Dropped]: '~',
-  [EntryStates.Completed]: <Center>x</Center>,
-  [EntryStates.ToDo]: <Center>#</Center>,
+  [EntryTypes.Task]: (
+    <IconContainer tip="Task">
+      <FiberManualRecordIcon style={ICON_STYLE} />
+    </IconContainer>
+  ),
+  [EntryTypes.Note]: (
+    <IconContainer tip="Note">
+      <NoteIcon style={ICON_STYLE} />
+    </IconContainer>
+  ),
+  [EntryTypes.Question]: (
+    <IconContainer tip="Question">
+      <HelpIcon style={ICON_STYLE} />
+    </IconContainer>
+  ),
+  [EntryTypes.Event]: (
+    <IconContainer tip="Event" padding="0 0 5px 0">
+      <ChangeHistory style={ICON_STYLE} />
+    </IconContainer>
+  ),
+  [EntryStates.Pushed]: (
+    <IconContainer tip="Pushed / Blocked" padding="0 0 0 10px">
+      <ArrowBackIosIcon style={ICON_STYLE} />
+    </IconContainer>
+  ),
+  [EntryStates.Migrated]: (
+    <IconContainer tip="Migrated">
+      <ArrowForwardIosIcon style={ICON_STYLE} />
+    </IconContainer>
+  ),
+  [EntryStates.Dropped]: (
+    <IconContainer tip="Dropped" padding="2.5px 0 0 0">
+      <StrikethroughSIcon style={ICON_STYLE} />
+    </IconContainer>
+  ),
+  [EntryStates.Completed]: (
+    <IconContainer tip="Completed">
+      <CheckCircleOutlineIcon style={ICON_STYLE} />
+    </IconContainer>
+  ),
+  [EntryStates.ToDo]: (
+    <IconContainer tip="Pending">
+      <RestoreIcon />
+    </IconContainer>
+  ),
 };
 
 const StateButton: React.FC<{

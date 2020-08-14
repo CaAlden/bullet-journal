@@ -22,14 +22,19 @@ export const Button: React.FC<{
   hoverColor: string;
   hoverBackground: string;
   disabled?: boolean;
+  visitble?: boolean,
 } & React.HTMLAttributes<HTMLButtonElement>> = ({
   hoverColor,
   hoverBackground,
   disabled,
+  visitble = true,
   ...props
 }) => {
   const className = useStyle({
     ...ButtonBase,
+
+    opacity: visitble ? 1 : 0,
+    transition: 'opacity 250ms ease-in-out',
     ':hover': {
       color: disabled ? 'inherit' : hoverColor,
       background: disabled ? '#ddd' : hoverBackground,

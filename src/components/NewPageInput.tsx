@@ -6,6 +6,7 @@ import { IO } from 'fp-ts/lib/IO';
 import { Button } from './Button';
 import { useColors } from '../Colors';
 import { useOnEnter } from '../utils';
+import AddIcon from '@material-ui/icons/Add';
 
 interface IProps {
   onNew: (page: IPage) => IO<void>;
@@ -47,7 +48,7 @@ const NewPageInput: React.FC<IProps> = ({ onNew }) => {
   const colors = useColors();
   const enterCallbackRef = useOnEnter(onSubmit);
   return (
-    <div className={classes.container}>
+    <>
       <input className={classes.input} ref={enterCallbackRef} value={name} onChange={e => setName(e.target.value)} placeholder="Input new page name"/>
       <Button
         hoverColor={colors.white}
@@ -58,8 +59,8 @@ const NewPageInput: React.FC<IProps> = ({ onNew }) => {
           fontSize: '1.25em',
           fontWeight: 'bold',
         }}
-      >+</Button>
-    </div>
+      ><AddIcon /></Button>
+    </>
   );
 };
 

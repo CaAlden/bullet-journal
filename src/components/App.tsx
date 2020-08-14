@@ -1,9 +1,10 @@
-import React, { useMemo, useEffect, useCallback, useState } from 'react';
+import React, { useMemo, useEffect, useCallback, useState, Fragment } from 'react';
 import { ap } from 'fp-ts/lib/Array';
 import { useStorage, Id, IRef } from '../io/db';
 import { useTrackedValue, useExistentTrackedValue } from '../io/useTrackedValue';
 import { EntryCodec, EntryType } from '../io/entry';
 import { JSONCodec } from '../io/json';
+import ClearIcon from '@material-ui/icons/Clear';
 import * as t from 'io-ts';
 import { pipe } from 'fp-ts/lib/pipeable';
 import { fold } from 'fp-ts/lib/Option';
@@ -142,31 +143,20 @@ export default function App() {
       background: colors.white,
       padding: '1em',
       display: 'grid',
-      gridTemplateColumns: '200px 1fr',
+      gridTemplateColumns: '250px 1fr',
       gridAutoColumns: '1fr',
       gap: '20px',
     },
     side: {
       padding: '5px',
-      display: 'flex',
-      flexDirection: 'column',
+      display: 'grid',
+      gridTemplateColumns: '1fr 30px',
+      gridAutoRows: 'min-content',
+      gap: '10px',
       borderRight: `1px solid ${colors.black}`,
     },
     main: {
       flexGrow: 1,
-    },
-    list: {
-      display: 'flex',
-      flexDirection: 'column',
-      margin: 0,
-      padding: 0,
-    },
-    listElm: {
-      display: 'flex',
-      alignItems: 'center',
-      flexGrow: 1,
-      justifyContent: 'space-between',
-      marginBottom: '10px',
     },
   });
 
@@ -203,38 +193,36 @@ export default function App() {
   return (
     <div className={appStyles.page}>
       <div className={appStyles.side}>
-        {!pages ? null :
-          <ul className={appStyles.list}>{pages.map((id) => (
-            <li className={appStyles.listElm} key={id}>
-              <PageLink
-                onClick={() => {
-                  setSelected(id);
-                  setLastVisited(id)();
-                }}
-                selected={selected === id}
-                id={id}
-              />
-              <Button
-                hoverColor={colors.white}
-                hoverBackground={colors.orange}
-                onClick={() => {
-                  removePage(id)();
-                  if (selected === id) {
-                    setSelected(null);
-                    pipe(
-                      lastVisited,
-                      fold(() => {}, (last) => {
-                        if (last === id) {
-                          setLastVisited(null)();
-                        }
-                      }),
-                    );
-                  }
-                }}
-              >X</Button>
-            </li>
-          ))}</ul>
-        }
+        {!pages ? null : pages.map((id) => (
+          <Fragment key={id}>
+            <PageLink
+              onClick={() => {
+                setSelected(id);
+                setLastVisited(id)();
+              }}
+              selected={selected === id}
+              id={id}
+            />
+            <Button
+              hoverColor={colors.white}
+              hoverBackground={colors.orange}
+              onClick={() => {
+                removePage(id)();
+                if (selected === id) {
+                  setSelected(null);
+                  pipe(
+                    lastVisited,
+                    fold(() => {}, (last) => {
+                      if (last === id) {
+                        setLastVisited(null)();
+                      }
+                    }),
+                  );
+                }
+              }}
+            ><ClearIcon /></Button>
+          </Fragment>
+        ))}
         <NewPageInput onNew={doPageCreation} />
       </div>
       <main className={appStyles.main}>
