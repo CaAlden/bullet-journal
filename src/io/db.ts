@@ -21,6 +21,10 @@ interface IStorageInterface {
   removeItem: (key: Id) => void;
 }
 
+interface IEventInterface {
+  addEventListener: (type: string, l: (e: StorageEvent) => void) => void;
+}
+
 export interface IPersistable {
   id: Id;
 }
@@ -58,24 +62,19 @@ export class DB implements IDbInteractor {
 
 type SubscriptionCallback = () => void;
 export class DBObserver implements IDbInteractor {
-  public static createObservableDb = (storage: IStorageInterface) => {
+  public static createObservableDb = (storage: IStorageInterface, eventApi: IEventInterface) => {
     const db = new DB(storage);
-    return new DBObserver(db);
+    return new DBObserver(db, eventApi);
   };
 
   private subscriptions: Map<string, SubscriptionCallback[]>;
-  private alwaysFires: Map<string, (id: string) => void>;
-  public constructor(private readonly db: DB) {
+  public constructor(private readonly db: DB, eventApi: IEventInterface) {
     this.subscriptions = new Map();
-    this.alwaysFires = new Map();
+    eventApi.addEventListener('storage', this.onEvent);
   }
 
-  public subscribeToSerialize = (callback: (id: string) => void): () => void => {
-    const unsubscribeId = v4();
-    this.alwaysFires.set(unsubscribeId, callback);
-    return () => {
-      this.alwaysFires.delete(unsubscribeId);
-    };
+  private onEvent = (e: StorageEvent) => {
+    this.notify(e.key);
   };
 
   public subscribe = (id: Id, callback: SubscriptionCallback): () => void => {
@@ -124,11 +123,6 @@ export class DBObserver implements IDbInteractor {
       chain(() => () => {
         this.notify(t.id);
       }),
-      chain(() => () => {
-        this.alwaysFires.forEach(cb => {
-          cb(t.id);
-        });
-      })
     );
   };
 
@@ -141,6 +135,6 @@ export class DBObserver implements IDbInteractor {
   };
 }
 
-const StorageDBContext = createContext(DBObserver.createObservableDb(window.localStorage));
+const StorageDBContext = createContext(DBObserver.createObservableDb(window.localStorage, window));
 export const useStorage = () => useContext(StorageDBContext);
 export const ProvideLocalStorageDB = StorageDBContext.Provider;
