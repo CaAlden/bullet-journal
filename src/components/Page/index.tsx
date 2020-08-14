@@ -13,6 +13,8 @@ import DragList from '../DragDrop/DragList';
 import { map, filter, rights, separate } from 'fp-ts/lib/Array';
 import { fromOption, fromPredicate, left, right } from 'fp-ts/lib/Either';
 import { Tooltip } from '@material-ui/core';
+import { Button } from '../Button';
+import { useColors } from '../../Colors';
 
 const usePage = (id: Id) => {
   const storage = useStorage();
@@ -121,11 +123,13 @@ const Page: React.FC<{ id: Id }> = ({
       paddingLeft: '20px',
     },
     actions: {
-      display: 'flex',
+      display: 'grid',
       gridTemplateColumns: '1fr 20px',
       gap: '10px',
     },
   });
+
+  const colors = useColors();
 
   const editableEntries = page.tasks.map(id => ({
     id,
@@ -137,13 +141,15 @@ const Page: React.FC<{ id: Id }> = ({
       <div className={classes.header}>
         <input className={classes.name} value={page.name} onChange={e => setName(e.target.value)}/>
         <div className={classes.actions}>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <label className={classes.label}>Show Completed</label>
             <input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} />
           </div>
-          <Tooltip title="Delete all completed entries">
-            <Delete style={{ height: '20px', width: '20px', cursor: 'pointer' }} onClick={removeCompleted} />
-          </Tooltip>
+            <Button onClick={removeCompleted} hoverBackground={colors.orange} hoverColor={colors.white}>
+              <Tooltip title="Delete all completed entries">
+                <Delete style={{ height: '20px', width: '20px', cursor: 'pointer' }} />
+              </Tooltip>
+            </Button>
         </div>
       </div>
       <DragList items={editableEntries} setItems={setTasks} />

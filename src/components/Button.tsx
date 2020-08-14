@@ -34,10 +34,14 @@ export const Button: React.FC<{
     ...ButtonBase,
 
     opacity: visitble ? 1 : 0,
-    transition: 'opacity 250ms ease-in-out',
+    transition: 'opacity 250ms ease-in-out, border 250ms linear',
     ':hover': {
       color: disabled ? 'inherit' : hoverColor,
       background: disabled ? '#ddd' : hoverBackground,
+      border: 0,
+    },
+    ':active': {
+      border: `10px solid ${hoverBackground}`,
     },
   });
 
