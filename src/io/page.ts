@@ -32,4 +32,4 @@ export const PageCodec: iots.Type<IPage, string, string> = JSONCodec.pipe(iots.t
   start: DateCodec,
   end: DateCodec,
   tasks: iots.array(iots.string),
-}));
+}), 'Page');

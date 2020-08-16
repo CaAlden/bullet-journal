@@ -20,6 +20,7 @@ import { identity } from 'fp-ts/lib/function';
 import { Button } from './Button';
 import { useDefaultPages } from './useDefaultPages';
 import { Divider } from '@material-ui/core';
+import { useMigrations } from '../Migration';
 
 export const REGISTRY_KEY = '__type_registry';
 export const RegistryCodec = JSONCodec.pipe(t.type({
@@ -137,6 +138,7 @@ const PageLink: React.FC<{
 export default function App() {
   const { registry, addPage, removePage } = useRegistry();
 
+  useMigrations();
   const colors = useColors();
   const appStyles = useStyles({
     page: {

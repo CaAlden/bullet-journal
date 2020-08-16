@@ -53,6 +53,6 @@ export const EntryCodec: iots.Type<IEntry, string, string> = JSONCodec.pipe(iots
   priority: iots.boolean,
   date: DateCodec,
   state: EntryStateCodec,
-}));
+}), 'Entry');
 
 export type EntryType = iots.TypeOf<typeof EntryCodec>;
