@@ -45,7 +45,7 @@ const AddNoteEntry: FC<INewNoteProps> = ({ pageId, onNew }) => {
 
   const ref = useOnEnter(onCreate);
   return (
-    <Card style={{ minHeight: '200px', minWidth: '400px' }}>
+    <Card style={{ minHeight: '300px', minWidth: '300px' }}>
       <CardContent>
         <TextField
           fullWidth
@@ -75,15 +75,24 @@ const EditNote: FC<INoteProps> = ({ id, removeEntry }) => {
   };
 
   const links = useLinks(entry.description);
+  const outerCardClass = useStyle({
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '300px',
+    minWidth: '300px',
+  });
+  const mainCardClass = useStyle({
+    flexGrow: 1,
+  });
 
   return entry.type === EntryTypes.Note ? (
-    <Card style={{ minHeight: '200px', minWidth: '400px' }}>
+    <Card className={outerCardClass}>
       <CardActions>
         <Button hoverColor={colors.white} hoverBackground={colors.orange} onClick={removeEntry}>
           <CloseIcon style={{ width: '20px', height: '20px' }}/>
         </Button>
       </CardActions>
-      <CardContent>
+      <CardContent className={mainCardClass}>
         <TextField
           multiline
           fullWidth

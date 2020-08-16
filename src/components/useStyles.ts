@@ -11,7 +11,7 @@ export const useStyle = (def: StyleArgs) => {
 export const useStyles = <T extends {[x: string]: StyleArgs }>(defs: T): {[K in keyof T]: string } => {
   const classNames = useMemo(() => {
     return Object.fromEntries(Object.entries(defs).map(
-      ([k, v]: [string, StyleArgs]) => [k, css(v, k)])
+      ([k, v]: [string, StyleArgs]) => [k, css(v)])
     ) as unknown as {[K in keyof T]: string};
   }, [defs]);
 
