@@ -18,6 +18,8 @@ import { useColors } from '../Colors';
 import { useLastVisited } from '../session';
 import { identity } from 'fp-ts/lib/function';
 import { Button } from './Button';
+import { useDefaultPages } from './useDefaultPages';
+import { Divider } from '@material-ui/core';
 
 export const REGISTRY_KEY = '__type_registry';
 export const RegistryCodec = JSONCodec.pipe(t.type({
@@ -25,7 +27,7 @@ export const RegistryCodec = JSONCodec.pipe(t.type({
   types: t.record(t.string, t.array(t.union([t.string, t.undefined]))),
 }));
 
-const useRegistry = () => {
+export const useRegistry = () => {
   const storage = useStorage();
   const registry = useTrackedValue({ id: REGISTRY_KEY, type: RegistryCodec });
   useEffect(() => {
@@ -168,6 +170,8 @@ export default function App() {
     ),
   );
 
+  const defaultPages = useDefaultPages();
+
   const { lastVisited, setLastVisited } = useLastVisited();
   const initial = !pages || pages.length === 0 ? null :
     fold<string, string>(
@@ -193,6 +197,20 @@ export default function App() {
   return (
     <div className={appStyles.page}>
       <div className={appStyles.side}>
+        {defaultPages.map(({ id }) =>
+          <Fragment key={id}>
+            <PageLink
+              onClick={() => {
+                setSelected(id);
+                setLastVisited(id)();
+              }}
+              selected={selected === id}
+              id={id}
+            />
+            <div />
+          </Fragment>
+        )}
+        <Divider /><div />
         {!pages ? null : pages.map((id) => (
           <Fragment key={id}>
             <PageLink

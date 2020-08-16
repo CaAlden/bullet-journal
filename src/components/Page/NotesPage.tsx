@@ -10,10 +10,12 @@ import { v4 } from 'uuid';
 import { useOnEnter } from '../../utils';
 import { IO } from 'fp-ts/lib/IO';
 import { useExistentTrackedValue } from '../../io/useTrackedValue';
-import { Card, CardContent, CardActions, TextField } from '@material-ui/core';
+import { Card, CardContent, CardActions, TextField, Divider } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import { Button } from '../Button';
 import { useColors } from '../../Colors';
+import Link from '../Link';
+import { useLinks } from '../useLinks';
 
 interface INewNoteProps {
   pageId: Id;
@@ -29,6 +31,11 @@ const getNote = (description: string): EntryType => ({
   state: EntryStates.ToDo,
 });
 
+const INPUT_OVERRIDES = {
+  disableUnderline: true,
+  style: { fontSize: 24 },
+};
+
 const AddNoteEntry: FC<INewNoteProps> = ({ pageId, onNew }) => {
   const [value, setValue] = useState('');
   const onCreate = () => {
@@ -38,7 +45,7 @@ const AddNoteEntry: FC<INewNoteProps> = ({ pageId, onNew }) => {
 
   const ref = useOnEnter(onCreate);
   return (
-    <Card>
+    <Card style={{ minHeight: '200px', minWidth: '400px' }}>
       <CardContent>
         <TextField
           fullWidth
@@ -47,7 +54,7 @@ const AddNoteEntry: FC<INewNoteProps> = ({ pageId, onNew }) => {
           ref={ref}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          InputProps={{ disableUnderline: true }}
+          InputProps={INPUT_OVERRIDES}
         />
       </CardContent>
     </Card>
@@ -67,8 +74,10 @@ const EditNote: FC<INoteProps> = ({ id, removeEntry }) => {
     storage.serialize({ ...entry, description }, EntryCodec)();
   };
 
+  const links = useLinks(entry.description);
+
   return entry.type === EntryTypes.Note ? (
-    <Card style={{ flexGrow: 1, minHeight: '200px', minWidth: '400px' }}>
+    <Card style={{ minHeight: '200px', minWidth: '400px' }}>
       <CardActions>
         <Button hoverColor={colors.white} hoverBackground={colors.orange} onClick={removeEntry}>
           <CloseIcon style={{ width: '20px', height: '20px' }}/>
@@ -79,10 +88,18 @@ const EditNote: FC<INoteProps> = ({ id, removeEntry }) => {
           multiline
           fullWidth
           value={entry.description}
-          InputProps={{ disableUnderline: true }}
+          InputProps={INPUT_OVERRIDES}
           onChange={e => setDescription(e.target.value)}
         />
       </CardContent>
+      {links.length > 0 && (
+        <>
+          <Divider />
+          <CardContent>
+            {links.map((l, id) => <Link key={id} link={l} />)}
+          </CardContent>
+        </>
+      )}
     </Card>
   ) : null;
 };
