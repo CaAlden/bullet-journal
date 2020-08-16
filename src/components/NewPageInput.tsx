@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IPage } from '../io/page';
+import { IPage, PageType } from '../io/page';
 import { v4 } from 'uuid';
 import { useStyles } from './useStyles';
 import { IO } from 'fp-ts/lib/IO';
@@ -15,6 +15,7 @@ interface IProps {
 const getDefaults = (): IPage => ({
   id: v4(),
   name: '',
+  type: PageType.Default,
   start: new Date(),
   end: new Date(),
   tasks: [],

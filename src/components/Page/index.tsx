@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Delete from '@material-ui/icons/Delete';
-import { EditEntry, AddEntry } from '../Entry';
 import { useStorage, Id } from '../../io/db';
-import { PageCodec } from '../../io/page';
+import { PageCodec, PageType } from '../../io/page';
 import { useTrackedValue, useExistentTrackedValue } from '../../io/useTrackedValue';
 import { EntryType, EntryCodec, EntryTypes, EntryStates } from '../../io/entry';
 import { pipe } from 'fp-ts/lib/pipeable';
 import { fold } from 'fp-ts/lib/Option';
 import { useStyles } from '../useStyles';
 import { chain } from 'fp-ts/lib/IO';
-import DragList from '../DragDrop/DragList';
 import { map, filter, rights, separate } from 'fp-ts/lib/Array';
 import { fromOption, fromPredicate, left, right } from 'fp-ts/lib/Either';
-import { Tooltip, Snackbar } from '@material-ui/core';
+import { Tooltip, Snackbar, Divider } from '@material-ui/core';
 import { Button } from '../Button';
 import { useColors } from '../../Colors';
+import PageTemplateSelector from './PageTemplateSelector';
+import DefaultPage from './DefaultPage';
+import NotesPage from './NotesPage';
 
-const usePage = (id: Id) => {
+export const usePage = (id: Id) => {
   const storage = useStorage();
   const page = useExistentTrackedValue({ id, type: PageCodec })
   const addEntry = (entry: EntryType) => {
@@ -70,6 +71,13 @@ const usePage = (id: Id) => {
     }, PageCodec)();
   }
 
+  const setType = (type: PageType) => {
+    storage.serialize({
+      ...page,
+      type,
+    }, PageCodec)();
+  }
+
   return ({
     page,
     setName,
@@ -77,6 +85,7 @@ const usePage = (id: Id) => {
     removeEntry,
     removeCompleted,
     setTasks,
+    setType,
   });
 };
 
@@ -86,11 +95,9 @@ const Page: React.FC<{ id: Id }> = ({
   const [showCompleted, setShowCompleted] = useState(false);
   const {
     page,
-    removeEntry,
     removeCompleted,
-    addEntry,
     setName,
-    setTasks,
+    setType,
   } = usePage(id);
   const classes = useStyles({
     main: {
@@ -119,12 +126,9 @@ const Page: React.FC<{ id: Id }> = ({
     label: {
       padding: '0 5px',
     },
-    addEntryContainer: {
-      paddingLeft: '20px',
-    },
     actions: {
       display: 'grid',
-      gridTemplateColumns: '1fr 20px',
+      gridTemplateColumns: '1fr 30px min-content min-content',
       gap: '10px',
     },
   });
@@ -147,10 +151,9 @@ const Page: React.FC<{ id: Id }> = ({
     }
   });
 
-  const editableEntries = page.tasks.map(id => ({
-    id,
-    element: <EditEntry id={id} remove={removeEntry(id)} showCompleted={showCompleted} />,
-  }));
+  const pageElm = page.type === PageType.Notes ? (
+    <NotesPage pageId={id} />
+  ) : <DefaultPage pageId={id} showCompleted={showCompleted} />;
 
   return (
     <div className={classes.main}>
@@ -161,25 +164,16 @@ const Page: React.FC<{ id: Id }> = ({
             <label className={classes.label}>Show Completed</label>
             <input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} />
           </div>
-            <Button onClick={removeCompletedAction} hoverBackground={colors.orange} hoverColor={colors.white}>
-              <Tooltip title="Delete all completed entries">
-                <Delete style={{ height: '20px', width: '20px', cursor: 'pointer' }} />
-              </Tooltip>
-            </Button>
+          <Button onClick={removeCompletedAction} hoverBackground={colors.orange} hoverColor={colors.white}>
+            <Tooltip title="Delete all completed entries">
+              <Delete style={{ height: '20px', width: '20px', cursor: 'pointer' }} />
+            </Tooltip>
+          </Button>
+          <Divider orientation="vertical" />
+          <PageTemplateSelector type={page.type} setType={setType} />
         </div>
       </div>
-      <DragList items={editableEntries} setItems={setTasks} />
-      <div className={classes.addEntryContainer}>
-        <AddEntry pageId={id} onNew={e => {
-          if (e.type !== EntryTypes.Event) {
-            // For now, we always want to have the most up to date submit date as possible (but events care a bit more about the date)
-            e.date = new Date();
-          }
-          const addIO = addEntry(e);
-          // Immediately perform the IO.
-          addIO();
-        }} />
-      </div>
+      {pageElm}
       <Snackbar
         open={showDeleted}
         autoHideDuration={3000}
