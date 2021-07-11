@@ -68,13 +68,21 @@ export class DBObserver implements IDbInteractor {
   };
 
   private subscriptions: Map<string, SubscriptionCallback[]>;
+  private ignoreUpdates: boolean;
   public constructor(private readonly db: DB, eventApi: IEventInterface) {
     this.subscriptions = new Map();
+    this.ignoreUpdates = false;
     eventApi.addEventListener('storage', this.onEvent);
   }
 
+  public setIgnore = (ignore: boolean) => {
+    this.ignoreUpdates = ignore;
+  };
+
   private onEvent = (e: StorageEvent) => {
-    this.notify(e.key);
+    if (!this.ignoreUpdates) {
+      this.notify(e.key);
+    }
   };
 
   public subscribe = (id: Id, callback: SubscriptionCallback): () => void => {
@@ -114,7 +122,10 @@ export class DBObserver implements IDbInteractor {
         map((cbk) => cbk()),
       )
     );
+  };
 
+  public notifyAll = () => {
+    this.subscriptions.forEach(cbks => cbks.forEach(cbk => cbk()));
   };
 
   public serialize = <T extends IPersistable>(t: T, type: t.Type<T, string, string>): IO<void> => {

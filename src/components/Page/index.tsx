@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Delete from '@material-ui/icons/Delete';
+import Save from '@material-ui/icons/Save';
 import { useStorage, Id } from '../../io/db';
 import { PageCodec, PageType } from '../../io/page';
 import { useTrackedValue, useExistentTrackedValue } from '../../io/useTrackedValue';
@@ -16,6 +17,7 @@ import { useColors } from '../../Colors';
 import PageTemplateSelector from './PageTemplateSelector';
 import DefaultPage from './DefaultPage';
 import NotesPage from './NotesPage';
+import SavePage from './SavePage';
 
 export const usePage = (id: Id) => {
   const storage = useStorage();
@@ -103,6 +105,7 @@ const Page: React.FC<{ id: Id }> = ({
     main: {
       display: 'flex',
       flexDirection: 'column',
+      flexGrow: 1,
       padding: '10px',
     },
     header: {
@@ -128,13 +131,14 @@ const Page: React.FC<{ id: Id }> = ({
     },
     actions: {
       display: 'grid',
-      gridTemplateColumns: '1fr 30px min-content min-content',
+      gridTemplateColumns: '1fr 30px min-content min-content min-content',
       gap: '10px',
     },
   });
 
   const colors = useColors();
   const [showDeleted, setShowDeleted] = useState(false);
+  const [showSavePage, setShowSavePage] = useState(false);
   const removeCompletedAction = () => {
     removeCompleted();
     setShowDeleted(true);
@@ -164,6 +168,17 @@ const Page: React.FC<{ id: Id }> = ({
             <label className={classes.label}>Show Completed</label>
             <input type="checkbox" checked={showCompleted} onChange={e => setShowCompleted(e.target.checked)} />
           </div>
+          <Button
+            onClick={() => setShowSavePage(t => !t)}
+            hoverBackground={colors.orange}
+            hoverColor={colors.white}
+            color={showSavePage ? colors.blue : colors.black}
+          >
+            <Tooltip title="Show/Hide save page">
+              <Save style={{ height: '20px', width: '20px', cursor: 'pointer' }} />
+            </Tooltip>
+          </Button>
+
           <Button onClick={removeCompletedAction} hoverBackground={colors.orange} hoverColor={colors.white}>
             <Tooltip title="Delete all completed entries">
               <Delete style={{ height: '20px', width: '20px', cursor: 'pointer' }} />
@@ -173,7 +188,7 @@ const Page: React.FC<{ id: Id }> = ({
           <PageTemplateSelector type={page.type} setType={setType} />
         </div>
       </div>
-      {pageElm}
+      {showSavePage ? <SavePage leave={() => setShowSavePage(false)} /> : pageElm}
       <Snackbar
         open={showDeleted}
         autoHideDuration={3000}

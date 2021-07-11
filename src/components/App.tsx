@@ -160,6 +160,8 @@ export default function App() {
       borderRight: `1px solid ${colors.black}`,
     },
     main: {
+      display: 'flex',
+      flexDirection: 'column',
       flexGrow: 1,
     },
   });
