@@ -18,7 +18,7 @@ const SavePage: FC<{ leave: () => void }> = ({ leave }) => {
   }, [textValue]);
   const downloadName = useMemo(() => {
     const now = new Date(Date.now());
-    return `bullet-journal-backup-${now.getDay()}-${now.getMonth()}-${now.getFullYear()}.json`;
+    return `bullet-journal-backup-${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}.json`;
   }, []);
 
   const classes = useStyles({
