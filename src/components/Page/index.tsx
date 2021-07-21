@@ -103,9 +103,6 @@ const Page: React.FC<{ id: Id }> = ({
   } = usePage(id);
   const classes = useStyles({
     main: {
-      display: 'flex',
-      flexDirection: 'column',
-      flexGrow: 1,
       padding: '10px',
     },
     header: {

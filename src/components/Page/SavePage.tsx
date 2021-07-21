@@ -29,6 +29,7 @@ const SavePage: FC<{ leave: () => void }> = ({ leave }) => {
     },
     textArea: {
       flexGrow: 1,
+      minHeight: '600px',
     },
     buttonGroup: {
       display: 'flex',
